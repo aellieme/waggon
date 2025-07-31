@@ -5,6 +5,7 @@ from waggon.optim import SurrogateOptimiser
 from waggon.surrogates import GP, DGP
 from waggon.acquisitions import CB
 
+import json
 
 opt = SurrogateOptimiser(
     func=conv.ConvNN(),
@@ -17,4 +18,17 @@ opt = SurrogateOptimiser(
 )
 
 result = opt.optimise()
+
+best_result = {
+    'x': result.x.tolist(),
+    'fun': result.fun.item(),
+    'success': result.success,
+    'message': result.message
+}
+
+with open("optimisation_result.json", 'w') as f:
+    json.dump(best_result, f, indent=2)
+
+# print(f"Saved optimisation result to optimisation_result.json")
+
 print(result)
