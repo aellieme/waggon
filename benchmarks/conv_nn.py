@@ -1,6 +1,7 @@
 import os
 import tempfile
 import pickle
+import json
 
 from waggon import functions as f
 
