@@ -64,6 +64,16 @@ class WindFarm(f.Function):
                             )
 
         self.fmodel = FlorisModel(path_to_config)
+                    
+    def save_configuration(self, path, config, aep):
+        data = {
+            'layout': config.reshape(self.number_of_turbines, 3).tolist(),
+            'aep': aep,
+            'wind_directions': self.wind_directions.tolist(),
+            'wind_speeds': self.wind_speeds.tolist()
+        }
+        with open(path, 'w') as f:
+            json.dump(data, f, indent=2)
 
     def __call__(self, X : np.array):
         results = []
@@ -92,6 +102,11 @@ class WindFarm(f.Function):
             # print(np.sum(distance.pdist(X))*1.5)
             aep = self.fmodel.get_farm_AEP()
             # turbine_powers = np.nan_to_num(self.fmodel.get_turbine_powers()) - np.sum(distance.pdist(config))*1.5
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            config_path = os.path.join("saved_configs", f"config_{i}_{timestamp}.json")
+            os.makedirs("saved_configs", exist_ok=True)
+            self.save_configuration(config_path, config, aep)    
+            
             results.append(aep/1E9)
 
         # print(turbine_powers)
