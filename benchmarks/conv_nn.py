@@ -172,6 +172,13 @@ class CIFAR10Model(nn.Module):
                 correct += predicted.eq(labels).sum().item()
         self.train()
         return val_loss / len(val_loader), 100. * correct / total
+    def save_model(self, path, config, accuracy):
+        torch.save({
+            'state_dict': self.state_dict(),
+            'config': config,
+            'accuracy': accuracy,
+            'model_class': type(self).__name__
+        }, path)
 
 class ConvNN(f.Function):
     def __init__(self, n_obs=1, model=1, minimise=True, logging=False, ray_tune=False, plot=False):
@@ -348,6 +355,23 @@ class ConvNN(f.Function):
                 
                 if self.logging:
                     print(f'Epoch {epoch+1} Validation Loss: {val_loss:.4f}, Accuracy: {accuracy:.2f}%')
+
+                if accuracy > best_metric:
+                    best_metric = accuracy
+                    # Сохранение лучшей модели для этой конфигурации
+                    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                    model_path = os.path.join("saved_models", f"model_{i}_{timestamp}.pth")
+                    os.makedirs("saved_models", exist_ok=True)
+                    model.save_model(model_path, config, best_metric)
+
+                if best_metric > 0:  # Сохраняем только успешно обученные модели
+                    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                    model_path = os.path.join("saved_models", f"model_{i}_{timestamp}.pth")
+                    os.makedirs("saved_models", exist_ok=True)
+                    model.save_model(model_path, config, best_metric)
+                    if self.logging:
+                        print(f"Saved model to {model_path} with accuracy {best_metric:.2f}%")
+                        
             results.append(best_metric)
 
         results = np.array(results).reshape(-1, 1)
