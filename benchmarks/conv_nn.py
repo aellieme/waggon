@@ -361,17 +361,17 @@ class ConvNN(f.Function):
                     best_metric = accuracy
                     # Сохранение лучшей модели для этой конфигурации
                     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                    model_path = os.path.join("saved_models", f"model_{i}_{timestamp}.pth")
+                    model_path = os.path.join("saved_models", f"model_{epoch}_{timestamp}.pth")
                     os.makedirs("saved_models", exist_ok=True)
                     model.save_model(model_path, config, best_metric)
 
-                if best_metric > 0:  # Сохраняем только успешно обученные модели
-                    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                    model_path = os.path.join("saved_models", f"model_{i}_{timestamp}.pth")
-                    os.makedirs("saved_models", exist_ok=True)
-                    model.save_model(model_path, config, best_metric)
-                    if self.logging:
-                        print(f"Saved model to {model_path} with accuracy {best_metric:.2f}%")
+                # if best_metric > 0:  
+                #     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                #     model_path = os.path.join("saved_models", f"model_{i}_{timestamp}.pth")
+                #     os.makedirs("saved_models", exist_ok=True)
+                #     model.save_model(model_path, config, best_metric)
+                #     if self.logging:
+                #         print(f"Saved model to {model_path} with accuracy {best_metric:.2f}%")
                         
             results.append(best_metric)
 
